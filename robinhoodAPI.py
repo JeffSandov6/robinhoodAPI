@@ -1,12 +1,10 @@
 import requests
 import getpass
+import json
 
 from endpoints import Endpoints
 
 
-#BELOW IS A SAMPLE REQUEST CALL FOR LOGIN
-"""curl 'https://api.robinhood.com/oauth2/token/' -H 'X-Robinhood-API-Version: 1.265.0' -H 'Referer: https://robinhood.com/' -H 'Origin: https://robinhood.com' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36' -H 'Content-Type: application/json' --data-binary '{"grant_type":"password","scope":"internal","client_id":"c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS","expires_in":86400,"device_token":"dc45d9a0-4a66-4fc1-a442-fb4198bf796b","username":"jeffrysandoval24@gmail.com","password":""}' --compressed
-"""
 
 
 #BELOW ARE THE REQUEST HEADERS
@@ -19,7 +17,7 @@ from endpoints import Endpoints
 """
 
 
-
+#jeffrysandoval24@gmail.com
 
 
 class RobinhoodAPI():
@@ -28,7 +26,7 @@ class RobinhoodAPI():
   username = None
   password = None
   session = None
-  access_token = None
+  access_token = None  #the auth token
   refresh_token = None 
   #to find this device token, log out robinhood on your browser,
   #inspect, go to network, and where it says filter, type token
@@ -87,10 +85,32 @@ class RobinhoodAPI():
     if 'access_token' in response_data.keys() and 'refresh_token' in response_data.keys():
       self.access_token = response_data['access_token']
       self.refresh_token = response_data['refresh_token']
+      self.session.headers['Authorization'] = 'Bearer ' + self.access_token
       return True
     
     return False
 
 
+  def pretty_print_response(self, json_response):
+    print(json.dumps(json_response, indent=4))
+
+
+  def get_transfer_history(self):
+    response = self.session.get(self.endpoint_manager.transfers(), timeout=15)
+    # response.raise_for_status()
+
+    response_data = response.json()
+
+    transfer_history = response_data['results']
+
+    self.pretty_print_response(transfer_history)
+
+
+# def get_dividends(self):
+
+
+
 
 obj = RobinhoodAPI()
+
+print(obj.get_transfer_history())
