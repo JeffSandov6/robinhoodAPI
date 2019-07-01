@@ -95,6 +95,8 @@ class RobinhoodAPI():
     print(json.dumps(json_response, indent=4))
 
 
+  ### GETTING USER DATA ###
+
   def get_transfer_history(self):
     response = self.session.get(self.endpoint_manager.transfers(), timeout=15)
     # response.raise_for_status()
@@ -106,11 +108,21 @@ class RobinhoodAPI():
     self.pretty_print_response(transfer_history)
 
 
-# def get_dividends(self):
+  def get_dividends(self):
+    response = self.session.get(self.endpoint_manager.dividends(), timeout=15)
+
+    response_data = response.json()
+
+    dividends_history = response_data['results']
+    
+    self.pretty_print_response(dividends_history)
 
 
+  ### GET ROBINHOOD DATA ###
 
+  
 
 obj = RobinhoodAPI()
 
 print(obj.get_transfer_history())
+# print(obj.get_dividends())

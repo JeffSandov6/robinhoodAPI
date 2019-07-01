@@ -6,3 +6,6 @@ class Endpoints:
 
   def transfers(self):
     return self.robinhood_url + "ach/transfers/"
+
+  def dividends(self):
+    return self.robinhood_url + "dividends/"
