@@ -120,9 +120,61 @@ class RobinhoodAPI():
 
   ### GET ROBINHOOD DATA ###
 
+  def get_current_top_movers(self): #this doesn't provide their market data
+    response = self.session.get(self.endpoint_manager.top_movers(), timeout=15)
+
+    response_data = response.json()
+
+    print(response_data)
+
+    top_movers_list = response_data['instruments'] 
+
+    for x in top_movers_list:
+      self.get_instrument(x)
+      # print("\n\n")
+
+
+  #this accepts only instrument (stock) endpoint. this wont work with just a stock
+  def get_instrument(self, instrument_endpoint):
+    inst_response = self.session.get(instrument_endpoint, timeout=15)
+    response_data = inst_response.json()
+
+    self.pretty_print_response(response_data)
+
+
+  
+  def get_stock_data(self, stock_ticker):
+
+    stock_id = self.get_stock_endpoint(stock_ticker)
+
+    if(len(stock_id) == 0):
+      print("no such stock ticker")
+      return
+
+    response = self.session.get(self.endpoint_manager.stock_market_data(stock_id), timeout=15)
+
+    response_data = response.json()
+
+    self.pretty_print_response(response_data)
+    
+
+  def get_stock_endpoint(self, stock_ticker):
+    #look up how the queries work
+    response = self.session.get(self.endpoint_manager.instruments(), params={'query': stock_ticker.upper()}, timeout=15)
+    
+
+    response_data = response.json()
+    
+    response_results = response_data['results'][0]
+    
+    return response_results['id']
+
+
   
 
 obj = RobinhoodAPI()
 
-print(obj.get_transfer_history())
-# print(obj.get_dividends())
+# obj.get_transfer_history()
+# obj.get_dividends()
+# obj.get_current_top_movers()
+obj.get_stock_data("NIO")
