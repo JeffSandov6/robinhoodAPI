@@ -33,6 +33,7 @@ class RobinhoodAPI():
   #log in to robinhood and click on token, then go down to 
   #request payload, where you'll see the device token
   DEVICE_TOKEN = "bd16f778-5814-4f14-9e5c-e7b053584529"
+  user_account_number = None
 
   endpoint_manager = Endpoints()
 
@@ -57,6 +58,8 @@ class RobinhoodAPI():
       is_logged_in = self.login()
 
     print("Login succesful")
+
+    self.get_user_account_info()
 
 
   #as of now, we aren't doing any checking for the case that the user has 2FA enabled, but maybe later
@@ -95,7 +98,7 @@ class RobinhoodAPI():
     print(json.dumps(json_response, indent=4))
 
 
-  ### GETTING USER DATA ###
+  #################### GETTING USER DATA ####################
 
   def get_transfer_history(self):
     response = self.session.get(self.endpoint_manager.transfers(), timeout=15)
@@ -118,20 +121,48 @@ class RobinhoodAPI():
     self.pretty_print_response(dividends_history)
 
 
-  ### GET ROBINHOOD DATA ###
+
+  def get_user_account_info(self, print_info = False):
+    response = self.session.get(self.endpoint_manager.account_info())
+
+    response_data = response.json()
+
+    if 'account_number' in response_data['results'][0].keys():
+      self.user_account_number = response_data['results'][0]['account_number']
+
+    if(print_info):
+      self.pretty_print_response(response_data['results'][0])
+
+
+
+  def get_user_portfolio(self):
+    response = self.session.get(self.endpoint_manager.portfolio(self.user_account_number))
+
+    response_data = response.json()
+
+    self.pretty_print_response(response_data)
+
+  
+  def get_user_positions(self):
+    response = self.session.get(self.endpoint_manager.positions(self.user_account_number))
+
+    response_data = response.json()
+
+    self.pretty_print_response(response_data)
+  
+
+
+  #################### GET ROBINHOOD DATA ####################
 
   def get_current_top_movers(self): #this doesn't provide their market data
     response = self.session.get(self.endpoint_manager.top_movers(), timeout=15)
 
     response_data = response.json()
 
-    print(response_data)
-
     top_movers_list = response_data['instruments'] 
 
     for x in top_movers_list:
       self.get_instrument(x)
-      # print("\n\n")
 
 
   #this accepts only instrument (stock) endpoint. this wont work with just a stock
@@ -177,4 +208,5 @@ obj = RobinhoodAPI()
 # obj.get_transfer_history()
 # obj.get_dividends()
 # obj.get_current_top_movers()
-obj.get_stock_data("NIO")
+# obj.get_stock_data("NIO")
+obj.get_user_positions()
