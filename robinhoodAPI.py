@@ -173,6 +173,13 @@ class RobinhoodAPI():
     self.pretty_print_response(response_data)
 
 
+  def get_stock_news(self, stock_ticker):
+    response = self.session.get(self.endpoint_manager.stock_news(stock_ticker.upper()))
+
+    response_data = response.json()
+
+    self.pretty_print_response(response_data)
+    
   
   def get_stock_data(self, stock_ticker):
 
@@ -182,7 +189,7 @@ class RobinhoodAPI():
       print("no such stock ticker")
       return
 
-    response = self.session.get(self.endpoint_manager.stock_market_data(stock_id), timeout=15)
+    response = self.session.get(self.endpoint_manager.stock_data(stock_id), timeout=15)
 
     response_data = response.json()
 
@@ -209,4 +216,6 @@ obj = RobinhoodAPI()
 # obj.get_dividends()
 # obj.get_current_top_movers()
 # obj.get_stock_data("NIO")
-obj.get_user_positions()
+obj.get_stock_news("NIO")
+# obj.get_user_positions()
+# obj.get_user_portfolio()
